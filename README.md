@@ -59,57 +59,31 @@ Usage:
 	namebench.py [options]
 
 Options:
-  -h, --help            show this help message and exit
-  -r RUN_COUNT, --runs=RUN_COUNT
-                        Number of test runs to perform on each nameserver.
-  -z CONFIG, --config=CONFIG
-                        Config file to use.
-  -o OUTPUT_FILE, --output=OUTPUT_FILE
-                        Filename to write output to
-  -t TEMPLATE, --template=TEMPLATE
-                        Template to use for output generation (ascii, html,
-                        resolv.conf)
-  -c CSV_FILE, --csv_output=CSV_FILE
-                        Filename to write query details to (CSV)
-  -j HEALTH_THREAD_COUNT, --health_threads=HEALTH_THREAD_COUNT
-                        # of health check threads to use
-  -J BENCHMARK_THREAD_COUNT, --benchmark_threads=BENCHMARK_THREAD_COUNT
-                        # of benchmark threads to use
-  -P PING_TIMEOUT, --ping_timeout=PING_TIMEOUT
-                        # of seconds ping requests timeout in.
-  -y TIMEOUT, --timeout=TIMEOUT
-                        # of seconds general requests timeout in.
-  -Y HEALTH_TIMEOUT, --health_timeout=HEALTH_TIMEOUT
-                        health check timeout (in seconds)
-  -i INPUT_SOURCE, --input=INPUT_SOURCE
-                        Import hostnames from an filename or application
-                        (alexa, cachehit, cachemiss, cachemix, camino, chrome,
-                        chromium, epiphany, firefox, flock, galeon, icab,
-                        internet_explorer, konqueror, midori, omniweb, opera,
-                        safari, seamonkey, squid, sunrise)
-  -I, --invalidate_cache
-                        Force health cache to be invalidated
-  -q QUERY_COUNT, --query_count=QUERY_COUNT
-                        Number of queries per run.
-  -m SELECT_MODE, --select_mode=SELECT_MODE
-                        Selection algorithm to use (weighted, random, chunk)
-  -s NUM_SERVERS, --num_servers=NUM_SERVERS
-                        Number of nameservers to include in test
-  -S, --system_only     Only test the currently configured system
-  - nameservers.
-  -w, --open_webbrowser
-                        Opens the final report in your browser
-  -u, --upload_results  Upload anonmyized results to SITE_URLl (default:
-                        False)
-  -U SITE_URL, --site_url=SITE_URL
-                        URL to upload results to
-                        (http://namebench.appspot.com/)
-  -H, --hide_results    Upload results, but keep them hidden from indexes.
-  -x, --no_gui          Disable GUI
-  -C, --enable-censorship-checks
-                        Enable censorship checks
-  -6, --ipv6_only       Only include IPv6 name servers
-  -O, --only            Only test nameservers passed as arguments
+-h, --help     				| show this help message and exit
+-r RUN_COUNT, --runs=RUN_COUNT		| Number of test runs to perform on each nameserver.
+-z CONFIG, --config=CONFIG		| Config file to use.
+-o OUTPUT_FILE, --output=OUTPUT_FILE	| Filename to write output to
+-t TEMPLATE, --template=TEMPLATE	| Template to use for output generation (ascii, html, resolv.conf)
+-c CSV_FILE, --csv_output=CSV_FILE	| Filename to write query details to (CSV)
+`-j HEALTH_THREAD_COUNT, --health_threads=HEALTH_THREAD_COUNT` | # of health check threads to use
+-J BENCHMARK_THREAD_COUNT, --benchmark_threads=BENCHMARK_THREAD_COUNT	| # of benchmark threads to use
+`-P PING_TIMEOUT, --ping_timeout=PING_TIMEOUT` | # of seconds ping requests timeout in.
+-y TIMEOUT, --timeout=TIMEOUT		| # of seconds general requests timeout in.
+-Y HEALTH_TIMEOUT, --health_timeout=HEALTH_TIMEOUT	| health check timeout (in seconds)
+-i INPUT_SOURCE, --input=INPUT_SOURCE	| Import hostnames from an filename or application (alexa, cachehit, cachemiss, cachemix, camino, chrome, chromium, epiphany, firefox, flock, galeon, icab, internet_explorer, konqueror, midori, omniweb, opera, safari, seamonkey, squid, sunrise)
+-I, --invalidate_cache			| Force health cache to be invalidated
+-q QUERY_COUNT, --query_count=QUERY_COUNT	| Number of queries per run.
+-m SELECT_MODE, --select_mode=SELECT_MODE	| Selection algorithm to use (weighted, random, chunk)
+-s NUM_SERVERS, --num_servers=NUM_SERVERS	| Number of nameservers to include in test
+-S, --system_only			| Only test the currently configured system nameservers.
+-w, --open_webbrowser			| Opens the final report in your browser
+-u, --upload_results			| Upload anonmyized results to SITE_URLl (default: False)
+-U SITE_URL, --site_url=SITE_URL	| URL to upload results to http://namebench.appspot.com/
+-H, --hide_results			| Upload results, but keep them hidden from indexes.
+-x, --no_gui				| Disable GUI
+-C, --enable-censorship-checks		| Enable censorship checks
+-6, --ipv6_only				| Only include IPv6 name servers
+-O, --only				| Only test nameservers passed as arguments
 
 sample output
 -------------
@@ -223,40 +197,40 @@ FAQ
 
 See http://code.google.com/p/namebench/wiki/FAQ for more recent updates.
 
-1. What does 'NXDOMAIN Hijacking' mean?
+1. What does `NXDOMAIN Hijacking` mean?
 
 	This means that the specific DNS server returns a false entry when a
 	non-existent record is requested. This entry likely points to a website
 	serving a 'Host not found' page with banner ads.
 
-2. What does 'www.google.com. may be hijacked' mean?
+2. What does `www.google.com. may be hijacked` mean?
 
-	This means that when a user requests 'www.google.com', they are being
+	This means that when a user requests `www.google.com`, they are being
 	silently redirected to another server. The page may look like it's run by
 	Google, but it is instead being proxied through another server. For details,
 	try using the host command. In this case, this particular IP server is
 	redirecting all traffic to http://google.navigation.opendns.com/
 
-	% host www.google.com. 208.67.220.220
-	Using domain server:
-	Name: 208.67.220.220
-	Address: 208.67.220.220#53
-	Aliases:
+		% host www.google.com. 208.67.220.220
+		Using domain server:
+		Name: 208.67.220.220
+		Address: 208.67.220.220#53
+		Aliases:
 
-	www.google.com is an alias for google.navigation.opendns.com.
-	google.navigation.opendns.com has address 208.67.217.230
-	google.navigation.opendns.com has address 208.67.217.231
+		www.google.com is an alias for google.navigation.opendns.com.
+		google.navigation.opendns.com has address 208.67.217.230
+		google.navigation.opendns.com has address 208.67.217.231
 
 
-3. What does 'google.com. may be hijacked' mean?
+3. What does `google.com. may be hijacked` mean?
 
 	The same as above, but it is a rarer condition as it breaks http://google.com/
 
-4. What does 'thread.error: can't start new thread' mean?
+4. What does `thread.error: can't start new thread` mean?
 
 	It means you are using too many threads. Try restarting namebench.py with -j8
 
-5. What does 'unhealthy: TestWwwGoogleComResponse <class 'dns.exception.Timeout'>' mean?
+5. What does `unhealthy: TestWwwGoogleComResponse <class 'dns.exception.Timeout'>` mean?
 
 	It means the specified nameserver was too slow to answer you. If all of your
 	nameservers are timing out, try restarting namebench.py with -Y 4
