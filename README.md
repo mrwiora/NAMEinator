@@ -59,6 +59,8 @@ Usage:
 	namebench.py [options]
 
 Options:
+| Option				| Description				|
+| ------------------------------------- | ------------------------------------- |
 | -h, --help     				| show this help message and exit
 | -r RUN_COUNT, --runs=RUN_COUNT		| Number of test runs to perform on each nameserver.
 | -z CONFIG, --config=CONFIG		| Config file to use.
