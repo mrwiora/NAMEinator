@@ -54,11 +54,11 @@ to the command-line, or edit namebench.cfg:
 
 namebench includes some wonderful third party software:
 
- * dnspython (http://www.dnspython.org/)
- * httplib2 (http://code.google.com/p/httplib2/)
- * graphy (http://graphy.googlecode.com/)
- * jinja2 (http://jinja.pocoo.org/2/)
- * Crystal SVG icons (http://www.everaldo.com/crystal/)
+* dnspython http://www.dnspython.org/
+* httplib2 http://code.google.com/p/httplib2/
+* graphy http://graphy.googlecode.com/
+* jinja2 http://jinja.pocoo.org/2/
+* Crystal SVG icons http://www.everaldo.com/crystal/
 
 For licensing information, see the LICENSE file within the appropriate
 subdirectory.
