@@ -1,16 +1,5 @@
---[ fork-note ]---------------------------------------------------------
-
-This fork is intended to continue the development of the base namebench version 1.
-I've updated branch 1.3 to an working CLI-Version and removed the namebench2 branch.
-
-Please see the issues list at https://github.com/mwiora/namebench/issues to vote for
-the next covered topic.
-
-Cheers,
-Matthias
-
-
---[ original readme ]---------------------------------------------------------
+namebench
+=========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet
 experience?
@@ -27,10 +16,10 @@ graphical user interface as well as a command-line interface.
 
 Requirements:
 
-  * Python 2.4 - 2.6. If you are using Mac OS X or Linux, this is
-    built-in. Otherwise, visit http://www.python.org/
+* Python 2.4 - 2.6. If you are using Mac OS X or Linux, this is built-in. Otherwise, visit http://www.python.org/
 
---[ quick use guide ]---------------------------------------------------------
+quick use guide
+---------------
 
 namebench comes with two interfaces: a simple graphical interface, and a
 more advanced command-line interface. If you have downloaded the versions
@@ -38,19 +27,20 @@ for Mac OS X and Windows, you will get the graphical interface by default.
 
 Most people will simply want to run this software with no arguments:
 
-  ./namebench.py
+	./namebench.py
 
 On UNIX, if you have python-tk installed, a graphical interface will pop up.
 If you would like to force use of the command-line, use -x:
 
-  ./namebench.py -x
+	./namebench.py -x
 
 If you want to specify an additional set of name services, simply add the IP
 to the command-line, or edit namebench.cfg:
 
-  ./namebench.py 10.0.0.1 192.168.0.1
+	./namebench.py 10.0.0.1 192.168.0.1
 
---[ credit ]------------------------------------------------------------------
+credit
+------
 
 namebench includes some wonderful third party software:
 
@@ -60,12 +50,13 @@ namebench includes some wonderful third party software:
 * jinja2 http://jinja.pocoo.org/2/
 * Crystal SVG icons http://www.everaldo.com/crystal/
 
-For licensing information, see the LICENSE file within the appropriate
-subdirectory.
+For licensing information, see the LICENSE file within the appropriate subdirectory.
 
---[ options ]-----------------------------------------------------------------
+options
+-------
 
-Usage: namebench.py [options]
+Usage:
+	namebench.py [options]
 
 Options:
   -h, --help            show this help message and exit
