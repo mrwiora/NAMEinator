@@ -56,9 +56,9 @@ options
 -------
 
 Usage:
+
 	namebench.py [options]
 
-Options:
 | Option				| Description				|
 | ------------------------------------- | ------------------------------------- |
 | -h, --help     				| show this help message and exit
