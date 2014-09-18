@@ -23,6 +23,9 @@ import simplejson
 
 import util
 
+import json
+
+
 
 def GetFromFreegeoip():
     apiUrl = 'http://www.freegeoip.net/json'
