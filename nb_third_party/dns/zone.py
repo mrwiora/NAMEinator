@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2007, 2009, 2010 Nominum, Inc.
+# Copyright (C) 2003-2007, 2009-2011 Nominum, Inc.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose with or without fee is hereby granted,
@@ -18,6 +18,7 @@
 from __future__ import generators
 
 import sys
+import re
 
 import dns.exception
 import dns.name
@@ -28,6 +29,8 @@ import dns.rdata
 import dns.rrset
 import dns.tokenizer
 import dns.ttl
+import dns.grange
+
 
 class BadZone(dns.exception.DNSException):
     """The zone is malformed."""
@@ -237,9 +240,9 @@ class Zone(object):
         """
 
         name = self._validate_name(name)
-        if isinstance(rdtype, str):
+        if isinstance(rdtype, (str, unicode)):
             rdtype = dns.rdatatype.from_text(rdtype)
-        if isinstance(covers, str):
+        if isinstance(covers, (str, unicode)):
             covers = dns.rdatatype.from_text(covers)
         node = self.find_node(name, create)
         return node.find_rdataset(self.rdclass, rdtype, covers, create)
@@ -300,9 +303,9 @@ class Zone(object):
         """
 
         name = self._validate_name(name)
-        if isinstance(rdtype, str):
+        if isinstance(rdtype, (str, unicode)):
             rdtype = dns.rdatatype.from_text(rdtype)
-        if isinstance(covers, str):
+        if isinstance(covers, (str, unicode)):
             covers = dns.rdatatype.from_text(covers)
         node = self.get_node(name)
         if not node is None:
@@ -363,9 +366,9 @@ class Zone(object):
         """
 
         name = self._validate_name(name)
-        if isinstance(rdtype, str):
+        if isinstance(rdtype, (str, unicode)):
             rdtype = dns.rdatatype.from_text(rdtype)
-        if isinstance(covers, str):
+        if isinstance(covers, (str, unicode)):
             covers = dns.rdatatype.from_text(covers)
         rdataset = self.nodes[name].find_rdataset(self.rdclass, rdtype, covers)
         rrset = dns.rrset.RRset(name, self.rdclass, rdtype, covers)
@@ -419,9 +422,9 @@ class Zone(object):
         @type covers: int or string
         """
 
-        if isinstance(rdtype, str):
+        if isinstance(rdtype, (str, unicode)):
             rdtype = dns.rdatatype.from_text(rdtype)
-        if isinstance(covers, str):
+        if isinstance(covers, (str, unicode)):
             covers = dns.rdatatype.from_text(covers)
         for (name, node) in self.iteritems():
             for rds in node:
@@ -442,9 +445,9 @@ class Zone(object):
         @type covers: int or string
         """
 
-        if isinstance(rdtype, str):
+        if isinstance(rdtype, (str, unicode)):
             rdtype = dns.rdatatype.from_text(rdtype)
-        if isinstance(covers, str):
+        if isinstance(covers, (str, unicode)):
             covers = dns.rdatatype.from_text(covers)
         for (name, node) in self.iteritems():
             for rds in node:
@@ -641,6 +644,166 @@ class _MasterReader(object):
         rds = n.find_rdataset(rdclass, rdtype, covers, True)
         rds.add(rd, ttl)
 
+    def _parse_modify(self, side):
+        # Here we catch everything in '{' '}' in a group so we can replace it
+        # with ''.
+        is_generate1 = re.compile("^.*\$({(\+|-?)(\d+),(\d+),(.)}).*$")
+        is_generate2 = re.compile("^.*\$({(\+|-?)(\d+)}).*$")
+        is_generate3 = re.compile("^.*\$({(\+|-?)(\d+),(\d+)}).*$")
+        # Sometimes there are modifiers in the hostname. These come after
+        # the dollar sign. They are in the form: ${offset[,width[,base]]}.
+        # Make names
+        g1 = is_generate1.match(side)
+        if g1:
+            mod, sign, offset, width, base = g1.groups()
+            if sign == '':
+                sign = '+'
+        g2 = is_generate2.match(side)
+        if g2:
+            mod, sign, offset = g2.groups()
+            if sign == '':
+                sign = '+'
+            width = 0
+            base = 'd'
+        g3 = is_generate3.match(side)
+        if g3:
+            mod, sign, offset, width = g1.groups()
+            if sign == '':
+                sign = '+'
+            width = g1.groups()[2]
+            base = 'd'
+
+        if not (g1 or g2 or g3):
+            mod = ''
+            sign = '+'
+            offset = 0
+            width = 0
+            base = 'd'
+
+        if base != 'd':
+            raise NotImplemented
+
+        return mod, sign, offset, width, base
+
+    def _generate_line(self):
+        # range lhs [ttl] [class] type rhs [ comment ]
+        """Process one line containing the GENERATE statement from a DNS
+        master file."""
+        if self.current_origin is None:
+            raise UnknownOrigin
+
+        token = self.tok.get()
+        # Range (required)
+        try:
+            start, stop, step = dns.grange.from_text(token.value)
+            token = self.tok.get()
+            if not token.is_identifier():
+                raise dns.exception.SyntaxError
+        except:
+            raise dns.exception.SyntaxError
+
+        # lhs (required)
+        try:
+            lhs = token.value
+            token = self.tok.get()
+            if not token.is_identifier():
+                raise dns.exception.SyntaxError
+        except:
+            raise dns.exception.SyntaxError
+
+        # TTL
+        try:
+            ttl = dns.ttl.from_text(token.value)
+            token = self.tok.get()
+            if not token.is_identifier():
+                raise dns.exception.SyntaxError
+        except dns.ttl.BadTTL:
+            ttl = self.ttl
+        # Class
+        try:
+            rdclass = dns.rdataclass.from_text(token.value)
+            token = self.tok.get()
+            if not token.is_identifier():
+                raise dns.exception.SyntaxError
+        except dns.exception.SyntaxError:
+            raise dns.exception.SyntaxError
+        except:
+            rdclass = self.zone.rdclass
+        if rdclass != self.zone.rdclass:
+            raise dns.exception.SyntaxError("RR class is not zone's class")
+        # Type
+        try:
+            rdtype = dns.rdatatype.from_text(token.value)
+            token = self.tok.get()
+            if not token.is_identifier():
+                raise dns.exception.SyntaxError
+        except:
+            raise dns.exception.SyntaxError("unknown rdatatype '%s'" %
+                    token.value)
+
+        # lhs (required)
+        try:
+            rhs = token.value
+        except:
+            raise dns.exception.SyntaxError
+
+
+        lmod, lsign, loffset, lwidth, lbase = self._parse_modify(lhs)
+        rmod, rsign, roffset, rwidth, rbase = self._parse_modify(rhs)
+        for i in range(start, stop + 1, step):
+            # +1 because bind is inclusive and python is exclusive
+
+            if lsign == '+':
+                lindex = i + int(loffset)
+            elif lsign == '-':
+                lindex = i - int(loffset)
+
+            if rsign == '-':
+                rindex = i - int(roffset)
+            elif rsign == '+':
+                rindex = i + int(roffset)
+
+            lzfindex = str(lindex).zfill(int(lwidth))
+            rzfindex = str(rindex).zfill(int(rwidth))
+
+
+            name = lhs.replace('$%s' % (lmod), lzfindex)
+            rdata = rhs.replace('$%s' % (rmod), rzfindex)
+
+            self.last_name = dns.name.from_text(name, self.current_origin)
+            name = self.last_name
+            if not name.is_subdomain(self.zone.origin):
+                self._eat_line()
+                return
+            if self.relativize:
+                name = name.relativize(self.zone.origin)
+
+            n = self.zone.nodes.get(name)
+            if n is None:
+                n = self.zone.node_factory()
+                self.zone.nodes[name] = n
+            try:
+                rd = dns.rdata.from_text(rdclass, rdtype, rdata,
+                                         self.current_origin, False)
+            except dns.exception.SyntaxError:
+                # Catch and reraise.
+                (ty, va) = sys.exc_info()[:2]
+                raise va
+            except:
+                # All exceptions that occur in the processing of rdata
+                # are treated as syntax errors.  This is not strictly
+                # correct, but it is correct almost all of the time.
+                # We convert them to syntax errors so that we can emit
+                # helpful filename:line info.
+                (ty, va) = sys.exc_info()[:2]
+                raise dns.exception.SyntaxError("caught exception %s: %s" %
+                        (str(ty), str(va)))
+
+            rd.choose_relativity(self.zone.origin, self.relativize)
+            covers = rd.covers()
+            rds = n.find_rdataset(rdclass, rdtype, covers, True)
+            rds.add(rd, ttl)
+
     def read(self):
         """Read a DNS master file and build a zone object.
 
@@ -682,8 +845,6 @@ class _MasterReader(object):
                             self.zone.origin = self.current_origin
                     elif u == '$INCLUDE' and self.allow_include:
                         token = self.tok.get()
-                        if not token.is_quoted_string():
-                            raise dns.exception.SyntaxError("bad filename in $INCLUDE")
                         filename = token.value
                         token = self.tok.get()
                         if token.is_identifier():
@@ -703,6 +864,8 @@ class _MasterReader(object):
                         self.tok = dns.tokenizer.Tokenizer(self.current_file,
                                                            filename)
                         self.current_origin = new_origin
+                    elif u == '$GENERATE':
+                        self._generate_line()
                     else:
                         raise dns.exception.SyntaxError("Unknown master file directive '" + u + "'")
                     continue
@@ -817,7 +980,7 @@ def from_file(f, origin = None, rdclass = dns.rdataclass.IN,
             f.close()
     return z
 
-def from_xfr(xfr, zone_factory=Zone, relativize=True):
+def from_xfr(xfr, zone_factory=Zone, relativize=True, check_origin=True):
     """Convert the output of a zone transfer generator into a zone object.
 
     @param xfr: The xfr generator
@@ -826,6 +989,9 @@ def from_xfr(xfr, zone_factory=Zone, relativize=True):
     It is essential that the relativize setting matches the one specified
     to dns.query.xfr().
     @type relativize: bool
+    @param check_origin: should sanity checks of the origin node be done?
+    The default is True.
+    @type check_origin: bool
     @raises dns.zone.NoSOA: No SOA RR was found at the zone origin
     @raises dns.zone.NoNS: No NS RRset was found at the zone origin
     @rtype: dns.zone.Zone object
@@ -851,5 +1017,6 @@ def from_xfr(xfr, zone_factory=Zone, relativize=True):
             for rd in rrset:
                 rd.choose_relativity(z.origin, relativize)
                 zrds.add(rd)
-    z.check_origin()
+    if check_origin:
+        z.check_origin()
     return z

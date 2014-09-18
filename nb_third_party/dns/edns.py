@@ -1,4 +1,4 @@
-# Copyright (C) 2009 Nominum, Inc.
+# Copyright (C) 2009, 2011 Nominum, Inc.
 #
 # Permission to use, copy, modify, and distribute this software and its
 # documentation for any purpose with or without fee is hereby granted,
@@ -23,8 +23,8 @@ class Option(object):
 
     def __init__(self, otype):
         """Initialize an option.
-        @param rdtype: The rdata type
-        @type rdtype: int
+        @param otype: The rdata type
+        @type otype: int
         """
         self.otype = otype
 
@@ -44,13 +44,13 @@ class Option(object):
         @type current: int
         @param olen: The length of the wire-format option data
         @type olen: int
-        @rtype: dns.ends.Option instance"""
+        @rtype: dns.edns.Option instance"""
         raise NotImplementedError
 
     from_wire = classmethod(from_wire)
 
     def _cmp(self, other):
-        """Compare an ENDS option with another option of the same type.
+        """Compare an EDNS option with another option of the same type.
         Return < 0 if self < other, 0 if self == other, and > 0 if self > other.
         """
         raise NotImplementedError
@@ -136,7 +136,7 @@ def option_from_wire(otype, wire, current, olen):
     @type current: int
     @param olen: The length of the wire-format option data
     @type olen: int
-    @rtype: dns.ends.Option instance"""
+    @rtype: dns.edns.Option instance"""
 
     cls = get_option_class(otype)
     return cls.from_wire(otype, wire, current, olen)
