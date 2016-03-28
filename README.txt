@@ -1,7 +1,7 @@
 --[ fork-note ]---------------------------------------------------------
 
 This fork is intended to continue the development of the base namebench version 1.
-I've updated branch 1.5 to an working CLI-Version and removed the namebench2 branch.
+I've updated branch 1.3 to an working CLI-Version and removed the namebench2 branch.
 
 Please see the issues list at https://github.com/mwiora/namebench/issues to vote for
 the next covered topic.
