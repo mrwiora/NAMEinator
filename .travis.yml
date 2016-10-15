@@ -11,7 +11,7 @@ install:
 
 script:
   # TODO: linting
-  - pylint --reports=y *.py
+  - pylint *.py
   # run the namebench test
   - python namebench.py
 
