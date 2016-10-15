@@ -10,10 +10,7 @@ install:
   - sudo apt-get -y install pylint
 
 script:
-  # TODO: linting
-  - pylint *.py
-  # run the namebench test
-  - python namebench.py
+  - pylint *.py && python namebench.py
 
 notifications:
   email: false
