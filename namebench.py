@@ -74,4 +74,3 @@ if __name__ == '__main__':
 
     namebench = interface(options, supplied_ns, global_ns, regional_ns, version=version.VERSION)
     namebench.Execute()
-
