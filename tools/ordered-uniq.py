@@ -18,10 +18,10 @@
 import sys
 seen = {}
 for full_line in sys.stdin:
-  line = full_line.rstrip()
-  if line not in seen:
-    sys.stdout.write(full_line)
-    seen[line] = 1
+    line = full_line.rstrip()
+    if line not in seen:
+        sys.stdout.write(full_line)
+        seen[line] = 1
 
 sys.stdout.close()
 sys.stdin.close()
