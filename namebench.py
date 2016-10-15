@@ -54,7 +54,7 @@ if __name__ == '__main__':
             # Workaround for unicode path errors.
             # See http://code.google.com/p/namebench/issues/detail?id=41
             if hasattr(sys, 'winver') and hasattr(sys, 'frozen'):
-                os.environ['TCL_LIBRARY'] = os.path.join(os.path.dirname(sys.executable), 
+                os.environ['TCL_LIBRARY'] = os.path.join(os.path.dirname(sys.executable),
                                                          'tcl', 'tcl8.5')
                 os.environ['TK_LIBRARY'] = os.path.join(os.path.dirname(sys.executable),
                                                         'tcl', 'tk8.5')
