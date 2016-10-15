@@ -49,7 +49,7 @@ for ns in nameservers:
             details = geo_city.record_by_addr(ns.ip)
         except:
             pass
-            
+
     if not details:
         details = {}
     city = details.get('city', '')
@@ -80,7 +80,7 @@ for ns in nameservers:
     elif ns.warnings:
         note = '_WARNING/%s_' % '/'.join(list(ns.warnings))
     else:
-        note = '' 
+        note = ''
 
     geo = '/'.join([x for x in [city, region, country] if x and not x.isdigit()])
     entry = "%-50.50s # %s, %s, %s (%s) %s" % (main, ns.hostname, latitude, longitude, geo, note)
