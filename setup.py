@@ -19,8 +19,8 @@
 __author__ = 'tstromberg@google.com (Thomas Stromberg)'
 
 import os
-from libnamebench import version
 from distutils.core import setup
+from libnamebench import version
 try:
     import py2exe
 except ImportError:
@@ -28,7 +28,7 @@ except ImportError:
 
 # If you don't want 3rd party libraries included, set this in your environment.
 if os.getenv('NO_THIRD_PARTY', None):
-    packages=['libnamebench']
+    packages = ['libnamebench']
 else:
     packages = [
         'libnamebench',
@@ -136,28 +136,28 @@ setup(name='namebench',
       ],
 
       # py2exe specific garbarge below.
-        options={
-            'py2exe': {
-                'bundle_files': 3, # 1 nor 2 does not work
-                'ascii': False,
-                'packages': ['nb_third_party'],
-                'excludes': ['dns', 'jinja2', 'graphy', 'httplib2', 'tcl', 'simplejson'],
-                'dll_excludes': ["w9xpopen.exe","MSVCP90.dll", "MSVCR90.DLL"],
-            }
-        },
-        zipfile = "namebench.zip", # None - when bundle_files 1 or 2 can work.
-        windows=[{
-            'script': "namebench.py",
-            'dest_base': "namebench",
-            'name': "namebench",
-            'copyright': "(c) 2009 Google, Inc.",
-            'comments': "http://namebench.googlecode.com/",
-            'other_resources': [
-                # Windows Common Controls, XP Look
-                (RT_MANIFEST, 1, manifest_template % dict(prog="namebench")),
-                # VCRT 2008
-                (RT_MANIFEST, 1, rt90_manifest), # 1 - EXE CRT Manifest, 2 - DLL
-            ],
-        }],
-#       console=['namebench.py']
-)
+      options={
+          'py2exe': {
+              'bundle_files': 3, # 1 nor 2 does not work
+              'ascii': False,
+              'packages': ['nb_third_party'],
+              'excludes': ['dns', 'jinja2', 'graphy', 'httplib2', 'tcl', 'simplejson'],
+              'dll_excludes': ["w9xpopen.exe", "MSVCP90.dll", "MSVCR90.DLL"],
+          }
+      },
+      zipfile="namebench.zip", # None - when bundle_files 1 or 2 can work.
+      windows=[{
+          'script': "namebench.py",
+          'dest_base': "namebench",
+          'name': "namebench",
+          'copyright': "(c) 2009 Google, Inc.",
+          'comments': "http://namebench.googlecode.com/",
+          'other_resources': [
+              # Windows Common Controls, XP Look
+              (RT_MANIFEST, 1, manifest_template % dict(prog="namebench")),
+              # VCRT 2008
+              (RT_MANIFEST, 1, rt90_manifest), # 1 - EXE CRT Manifest, 2 - DLL
+          ],
+      }],
+      # console=['namebench.py']
+     )
