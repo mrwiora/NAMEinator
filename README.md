@@ -1,4 +1,4 @@
-namebench
+namebench |build-status| |coverage-status|
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet
@@ -241,4 +241,6 @@ See http://code.google.com/p/namebench/wiki/FAQ for more recent updates.
 
 	I an more interested in learning python than Go at this point in my life.
 
-
+.. |build-status| image:: https://img.shields.io/travis/facastagnini/namebench.svg?branch=1.3-dev
+   :target: https://travis-ci.org/facastagnini/namebench
+   :alt: Build status
