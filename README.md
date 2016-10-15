@@ -1,4 +1,4 @@
-namebench [![Build Status](https://travis-ci.org/facastagnini/namebench.svg)](https://travis-ci.org/facastagnini/namebench)
+namebench [![Build Status](https://travis-ci.org/mwiora/namebench.svg)](https://travis-ci.org/mwiora/namebench)
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet
