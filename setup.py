@@ -26,7 +26,7 @@ try:
 except ImportError:
     pass
 
-# If you don't want 3rd party libraries included, set this in your environment.  
+# If you don't want 3rd party libraries included, set this in your environment.
 if os.getenv('NO_THIRD_PARTY', None):
   packages=['libnamebench']
 else:
