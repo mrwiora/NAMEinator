@@ -1,0 +1,17 @@
+language: python
+python:
+  - 2.6
+  - 2.7
+  - pypy
+
+install:
+  # Build/test dependencies
+  - python setup.py install
+  - sudo apt-get -y install pylint
+
+script:
+  # TODO: add libnamebench/*.py
+  - pylint --errors-only --rcfile=.pylintrc *.py && python namebench.py
+
+notifications:
+  email: false

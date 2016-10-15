@@ -1,4 +1,4 @@
-namebench
+namebench [![Build Status](https://travis-ci.org/facastagnini/namebench.svg)](https://travis-ci.org/facastagnini/namebench)
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet
@@ -240,5 +240,3 @@ See http://code.google.com/p/namebench/wiki/FAQ for more recent updates.
 6. Why stick with python?
 
 	I an more interested in learning python than Go at this point in my life.
-
-
