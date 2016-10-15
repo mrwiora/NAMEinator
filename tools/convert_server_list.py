@@ -5,7 +5,7 @@
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#      http://www.apache.org/licenses/LICENSE-2.0
+#            http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
@@ -42,46 +42,46 @@ nameservers = nameserver_list.NameServers(
 nameservers.PingNameServers()
 
 for ns in nameservers:
-  if ':' in ns.ip:
-    details = {}
-  else:
-    try:
-      details = geo_city.record_by_addr(ns.ip)
-    except:
-      pass
-      
-  if not details:
-    details = {}
-  city = details.get('city', '')
-  if city:
-    city = city.decode('latin-1')
-  country = details.get('country_name', '')
-  if country:
-    country = country.decode('latin-1')
-  latitude = details.get('latitude', '')
-  longitude = details.get('longitude', '')
-  country_code = details.get('country_code', '')
-  region = details.get('region_name', '')
-  if region:
-    region = region.decode('latin-1')
-  matches = re.search('[- ](\d+)', ns.name)
-  if matches:
-    instance = matches.group(1)
-    ns.name = re.sub('[- ]%s' % instance, '', ns.name)
-    main = u"%s=%s (%s)" % (ns.ip, ns.name, instance)
-  else:
-    main = u"%s=%s" % (ns.ip, ns.name)
-  if 'Responded with: REFUSED' in ns.warnings:
-    note = '_REFUSED_'
-  elif 'a.root-servers.net.: Timeout' in ns.warnings:
-    note = '_TIMEOUT_'
-  elif 'No answer (NOERROR): a.root-servers.net.' in ns.warnings:
-    note = '_NOANSWER_'
-  elif ns.warnings:
-    note = '_WARNING/%s_' % '/'.join(list(ns.warnings))
-  else:
-    note = '' 
+    if ':' in ns.ip:
+        details = {}
+    else:
+        try:
+            details = geo_city.record_by_addr(ns.ip)
+        except:
+            pass
+            
+    if not details:
+        details = {}
+    city = details.get('city', '')
+    if city:
+        city = city.decode('latin-1')
+    country = details.get('country_name', '')
+    if country:
+        country = country.decode('latin-1')
+    latitude = details.get('latitude', '')
+    longitude = details.get('longitude', '')
+    country_code = details.get('country_code', '')
+    region = details.get('region_name', '')
+    if region:
+        region = region.decode('latin-1')
+    matches = re.search('[- ](\d+)', ns.name)
+    if matches:
+        instance = matches.group(1)
+        ns.name = re.sub('[- ]%s' % instance, '', ns.name)
+        main = u"%s=%s (%s)" % (ns.ip, ns.name, instance)
+    else:
+        main = u"%s=%s" % (ns.ip, ns.name)
+    if 'Responded with: REFUSED' in ns.warnings:
+        note = '_REFUSED_'
+    elif 'a.root-servers.net.: Timeout' in ns.warnings:
+        note = '_TIMEOUT_'
+    elif 'No answer (NOERROR): a.root-servers.net.' in ns.warnings:
+        note = '_NOANSWER_'
+    elif ns.warnings:
+        note = '_WARNING/%s_' % '/'.join(list(ns.warnings))
+    else:
+        note = '' 
 
-  geo = '/'.join([x for x in [city, region, country] if x and not x.isdigit()])
-  entry = "%-50.50s # %s, %s, %s (%s) %s" % (main, ns.hostname, latitude, longitude, geo, note)
-  print entry.encode('utf-8')
+    geo = '/'.join([x for x in [city, region, country] if x and not x.isdigit()])
+    entry = "%-50.50s # %s, %s, %s (%s) %s" % (main, ns.hostname, latitude, longitude, geo, note)
+    print entry.encode('utf-8')
