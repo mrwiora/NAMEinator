@@ -28,22 +28,22 @@ except ImportError:
 
 # If you don't want 3rd party libraries included, set this in your environment.
 if os.getenv('NO_THIRD_PARTY', None):
-  packages=['libnamebench']
+    packages=['libnamebench']
 else:
-  packages = [
-      'libnamebench',
-      'nb_third_party',
-      'nb_third_party/dns',
-      'nb_third_party/dns/rdtypes',
-      'nb_third_party/dns/rdtypes/ANY',
-      'nb_third_party/dns/rdtypes/IN',
-      'nb_third_party/graphy',
-      'nb_third_party/jinja2',
-      'nb_third_party/httplib2',
-      'nb_third_party/simplejson',
-      'nb_third_party/graphy/backends',
-      'nb_third_party/graphy/backends/google_chart_api'
-  ]
+    packages = [
+        'libnamebench',
+        'nb_third_party',
+        'nb_third_party/dns',
+        'nb_third_party/dns/rdtypes',
+        'nb_third_party/dns/rdtypes/ANY',
+        'nb_third_party/dns/rdtypes/IN',
+        'nb_third_party/graphy',
+        'nb_third_party/jinja2',
+        'nb_third_party/httplib2',
+        'nb_third_party/simplejson',
+        'nb_third_party/graphy/backends',
+        'nb_third_party/graphy/backends/google_chart_api'
+    ]
 
 
 
