@@ -10,7 +10,8 @@ install:
   - sudo apt-get -y install pylint
 
 script:
-  - pylint --errors-only --rcfile=.pylintrc *.py libnamebench/*.py && python namebench.py
+  # TODO: add libnamebench/*.py
+  - pylint --errors-only --rcfile=.pylintrc *.py && python namebench.py
 
 notifications:
   email: false
