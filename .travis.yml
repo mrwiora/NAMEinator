@@ -11,9 +11,11 @@ python:
 install:
   # Build/test dependencies
   - python setup.py install
+  - pip install pylint
 
 script:
   # TODO: linting
+  - pylint --reports=y *.py
   # run the namebench test
   - python namebench.py
 
