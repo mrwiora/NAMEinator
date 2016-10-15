@@ -239,4 +239,4 @@ See http://code.google.com/p/namebench/wiki/FAQ for more recent updates.
 
 6. Why stick with python?
 
-	I an more interested in learning python than Go at this point in my life.
+	I am more interested in learning python than Go at this point in my life.
