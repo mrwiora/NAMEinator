@@ -16,7 +16,7 @@ graphical user interface as well as a command-line interface.
 
 Requirements:
 
-* Python 2.4 - 2.6. If you are using Mac OS X or Linux, this is built-in. Otherwise, visit http://www.python.org/
+* Python 2.7+. If you are using Mac OS X or Linux, this is built-in. Otherwise, visit http://www.python.org/
 
 quick use guide
 ---------------
