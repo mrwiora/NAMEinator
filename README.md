@@ -1,27 +1,32 @@
-namebench [![Build Status](https://travis-ci.org/mwiora/namebench.svg)](https://travis-ci.org/mwiora/namebench) [![Code Climate](https://codeclimate.com/github/mwiora/namebench/badges/gpa.svg)](https://codeclimate.com/github/mwiora/namebench)
+NAMEinator [![Build Status](https://travis-ci.org/mwiora/namebench.svg)](https://travis-ci.org/mwiora/namebench) [![Code Climate](https://codeclimate.com/github/mwiora/namebench/badges/gpa.svg)](https://codeclimate.com/github/mwiora/namebench)
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet
 experience?
 
-Try out namebench. It hunts down the fastest DNS servers available for your
-computer to use. namebench runs a fair and thorough benchmark using your web
+Try out NAMEinator. It hunts down the fastest DNS servers available for your
+computer to use. NAMEinator runs a fair and thorough benchmark using your web
 browser history, tcpdump output, or standardized datasets in order to
-provide an individualized recommendation. namebench is completely free and
+provide an individualized recommendation. NAMEinator is completely free and
 does not modify your system in any way. This project began as a 20% project
 at Google.
 
-namebench runs on Mac OS X, Windows, and UNIX, and is available with a
+NAMEinator runs on Mac OS X, Windows, and UNIX, and is available with a
 graphical user interface as well as a command-line interface. 
 
 Requirements:
 
 * Python 2.7+. If you are using Mac OS X or Linux, this is built-in. Otherwise, visit http://www.python.org/
 
+NOTE: This project has been forked from google/namebench. While it seems as the initial Author wanted to move the application towards GO - I just wanted to continue and maintain this python variant as it does what it should. To avoid issues finding this tool and to avoid unfancy branching issues I decided to
+* move that original "1.3" Branch back to "master"
+* rename that project from "namebench" to "NAMEinator"
+this renaming is subject to be done step by step (there are many cross-relations within the code so if someone has too much time :D)
+
 quick use guide
 ---------------
 
-namebench comes with two interfaces: a simple graphical interface, and a
+NAMEinator comes with two interfaces: a simple graphical interface, and a
 more advanced command-line interface. If you have downloaded the versions
 for Mac OS X and Windows, you will get the graphical interface by default.
 
@@ -42,7 +47,7 @@ to the command-line, or edit namebench.cfg:
 credit
 ------
 
-namebench includes some wonderful third party software:
+NAMEinator includes some wonderful third party software:
 
 * dnspython http://www.dnspython.org/
 * httplib2 http://code.google.com/p/httplib2/
@@ -197,7 +202,7 @@ sample output
 FAQ
 ---
 
-See http://code.google.com/p/namebench/wiki/FAQ for more recent updates.
+See https://github.com/mwiora/NAMEinator for more recent updates.
 
 1. What does `NXDOMAIN Hijacking` mean?
 
