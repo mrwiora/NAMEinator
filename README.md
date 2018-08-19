@@ -21,6 +21,7 @@ Requirements:
 NOTE: This project has been forked from google/namebench. While it seems as the initial Author wanted to move the application towards GO - I just wanted to continue and maintain this python variant as it does what it should. To avoid issues finding this tool and to avoid unfancy branching issues I decided to
 * move that original "1.3" Branch back to "master"
 * rename that project from "namebench" to "NAMEinator"
+
 this renaming is subject to be done step by step (there are many cross-relations within the code so if someone has too much time :D)
 
 quick use guide
