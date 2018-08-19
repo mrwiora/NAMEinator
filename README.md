@@ -18,7 +18,10 @@ Requirements:
 
 * Python 2.7+. If you are using Mac OS X or Linux, this is built-in. Otherwise, visit http://www.python.org/
 
-NOTE: This project has been forked from google/namebench. While it seems as the initial Author wanted to move the application towards GO - I just wanted to continue and maintain this python variant as it does what it should. To avoid issues finding this tool and to avoid unfancy branching issues I decided to
+continuation of this project
+---------------
+
+This project has been forked from google/namebench. While it seems as the initial Author wanted to move the application towards GO - I just wanted to continue and maintain this python variant as it does what it should. To avoid issues finding this tool and to avoid unfancy branching issues I decided to
 * move that original "1.3" Branch back to "master"
 * rename that project from "namebench" to "NAMEinator"
 
