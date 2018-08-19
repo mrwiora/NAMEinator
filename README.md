@@ -1,4 +1,4 @@
-NAMEinator [![Build Status](https://travis-ci.org/mwiora/NAMEinator.svg)](https://travis-ci.org/mwiora/NAMEinator.svg) [![Code Climate](https://codeclimate.com/github/mwiora/namebench/badges/gpa.svg)](https://codeclimate.com/github/mwiora/namebench)
+NAMEinator [![Build Status](https://travis-ci.org/mwiora/NAMEinator.svg)](https://travis-ci.org/mwiora/NAMEinator.svg) [![Code Climate](https://codeclimate.com/github/mwiora/NAMEinator/badges/gpa.svg)](https://codeclimate.com/github/mwiora/NAMEinator)
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet
