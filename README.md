@@ -245,7 +245,3 @@ See https://github.com/mwiora/NAMEinator for more recent updates.
 
 	It means the specified nameserver was too slow to answer you. If all of your
 	nameservers are timing out, try restarting namebench.py with -Y 4
-
-6. Why stick with python?
-
-	I am more interested in learning python than Go at this point in my life.
