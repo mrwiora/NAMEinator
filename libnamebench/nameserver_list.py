@@ -413,7 +413,7 @@ class NameServers(list):
       self.msg('Building initial DNS cache for %s nameservers (%s threads)' %
                (len(self), self.thread_count))
 
-    self.PingNameServers()
+    # self.PingNameServers() # we delegeated the DNS Server list to the provider of the DNS Servers
     if len(self.enabled) > int(self.num_servers * NS_CACHE_SLACK):
       self.DisableDistantServers()
     self.RunHealthCheckThreads(primary_checks)
