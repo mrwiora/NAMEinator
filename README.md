@@ -21,11 +21,8 @@ Requirements:
 continuation of this project
 ---------------
 
-This project has been forked from google/namebench. While it seems as the initial Author wanted to move the application towards GO - I just wanted to continue and maintain this python variant as it does what it should. To avoid issues finding this tool and to avoid unfancy branching issues I decided to
-* move that original "1.3" Branch back to "master"
-* rename that project from "namebench" to "NAMEinator"
-
-this renaming is subject to be done step by step (there are many cross-relations within the code so if someone has too much time :D)
+This project has been forked from google/namebench. While it seems as the initial Author wanted to move the application towards GO with another application use - I just wanted to continue and maintain this python variant as it does what it should.
+After investigation the python code showed up some very frustrating complications, which were leading to my decision to reimplement the initial application idea. This time in GO as Python seems not to be the best choice (frustration on UI, frustration on python2 vs python3...). As soon as I will have a first stable version I'll publish it on the master branch.
 
 quick use guide
 ---------------
