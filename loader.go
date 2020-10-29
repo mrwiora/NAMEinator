@@ -7,6 +7,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"os/user"
 	"time"
 )
 
@@ -14,7 +15,15 @@ func prepareBenchmarkNameservers(nsStore nsInfoMap) {
 	if appConfiguration.nameserver == "" {
 		// read global nameservers from given file
 		fmt.Println("trying to load nameservers from datasrc/nameserver-globals.csv")
-		readNameserversFromFile(nsStore, "datasrc/nameserver-globals.csv") // TODO: Split read and Load
+		// @ TODO refactor - there shouldn't be the same code in if and else
+		//			(but atm this is the only safe way)...
+		if _, err := os.Stat("datasrc/nameserver-globals.csv"); err == nil {
+			readNameserversFromFile(nsStore, "datasrc/nameserver-globals.csv") // TODO: Split read and Load
+		} else if usr, err := user.Current(); err == nil{
+			readNameserversFromFile(nsStore, usr.HomeDir + "/.config/nameinator/nameserver-globals.csv") // TODO: Split read and Load
+		} else {
+			readNameserversFromFile(nsStore, "datasrc/nameserver-globals.csv") // TODO: Split read and Load
+		}
 	} else {
 		loadNameserver(nsStore, appConfiguration.nameserver, "givenByParameter")
 	}
@@ -24,7 +33,18 @@ func prepareBenchmarkDomains(dStore dInfoMap) {
 	var domains []string
 	// read domains from given file
 	fmt.Println("trying to load domains from datasrc/alexa-top-2000-domains.txt")
-	alldomains, err := readloadDomainsFromFile("datasrc/alexa-top-2000-domains.txt")
+	var err error
+	var alldomains []string
+	var usr *user.User
+	// @ TODO refactor - there shouldn't be the same code in if and else
+	//			(but atm this is the only safe way)...
+	if _, err = os.Stat("datasrc/alexa-top-2000-domains.txt"); err == nil {
+		alldomains, err = readloadDomainsFromFile("datasrc/alexa-top-2000-domains.txt")
+	} else if usr, err = user.Current(); err == nil{
+		alldomains, err = readloadDomainsFromFile(usr.HomeDir + "/.config/nameinator/domains.txt")
+	} else {
+		alldomains, err = readloadDomainsFromFile("datasrc/alexa-top-2000-domains.txt")
+	}
 	_ = err // TODO: Exception handling in case that the files do not exist
 	// randomize domains from file to avoid cached results
 	rand.Seed(time.Now().UnixNano())
