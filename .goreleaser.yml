@@ -15,3 +15,5 @@ builds:
     -X main.DateBuilt={{.Date}}
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+files:
+  - datasrc/*
