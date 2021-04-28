@@ -1,0 +1,16 @@
+version: 2
+updates:
+- package-ecosystem: gomod
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "04:00"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: github.com/miekg/dns
+    versions:
+    - 1.1.35
+    - 1.1.37
+    - 1.1.38
+    - 1.1.39
+    - 1.1.40
