@@ -1,8 +1,10 @@
 package main
 
 import (
+	"embed"
 	"flag"
 	"fmt"
+	"github.com/cheggaaa/pb/v3"
 	"github.com/miekg/dns"
 	"log"
 	"os/exec"
@@ -12,28 +14,32 @@ import (
 )
 
 var VERSION = "custom"
-var appConfiguration APPconfig
+var appConfiguration AppConfig
 
-type APPconfig struct {
+type AppConfig struct {
 	numberOfDomains int
 	debug           bool
 	contest         bool
 	nameserver      string
 }
 
+//go:embed datasrc
+
+var datasrc embed.FS
+
 // process flags
 func processFlags() {
-	var appConfigstruct APPconfig
+	var appConfig AppConfig
 	flagNumberOfDomains := flag.Int("domains", 100, "number of domains to be tested")
 	flagNameserver := flag.String("nameserver", "", "specify a nameserver instead of using defaults")
 	flagContest := flag.Bool("contest", true, "contest=true/false : enable or disable a contest against your locally configured DNS server (default true)")
 	flagDebug := flag.Bool("debug", false, "debug=true/false : enable or disable debugging (default false)")
 	flag.Parse()
-	appConfigstruct.numberOfDomains = *flagNumberOfDomains
-	appConfigstruct.debug = *flagDebug
-	appConfigstruct.contest = *flagContest
-	appConfigstruct.nameserver = *flagNameserver
-	appConfiguration = appConfigstruct
+	appConfig.numberOfDomains = *flagNumberOfDomains
+	appConfig.debug = *flagDebug
+	appConfig.contest = *flagContest
+	appConfig.nameserver = *flagNameserver
+	appConfiguration = appConfig
 }
 
 // return the IP of the DNS used by the operating system
@@ -44,9 +50,9 @@ func getOSdns() string {
 		fmt.Println("DEBUG: nslookup output")
 		fmt.Printf("%s\n", out)
 	}
-	var errorcode = fmt.Sprint(err)
+	var errorCode = fmt.Sprint(err)
 	if err != nil {
-		if errorcode == "exit status 1" {
+		if errorCode == "exit status 1" {
 			// newer versions of nslookup return error code 1 when executing "nslookup ." - but that's fine for us
 			_ = err
 		} else {
@@ -56,14 +62,14 @@ func getOSdns() string {
 	}
 
 	// fmt.Printf("%s\n", out)
-	re := regexp.MustCompile("\\b\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\b") // TODO: Make IPv6 compatible
+	re := regexp.MustCompile("([0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3}\\.[0-9]{1,3})|(([a-f0-9:]+:+)+[a-f0-9]+)")
 	// fmt.Printf("%q\n", re.FindString(string(out)))
-	var localdns = re.FindString(string(out))
+	var localDNS = re.FindString(string(out))
 	if appConfiguration.debug {
 		fmt.Println("DEBUG: dns server")
-		fmt.Printf("%s\n", localdns)
+		fmt.Printf("%s\n", localDNS)
 	}
-	return localdns
+	return localDNS
 }
 
 // prints welcome messages
@@ -71,15 +77,15 @@ func printWelcome() {
 	fmt.Println("starting NAMEinator - version " + VERSION)
 	fmt.Printf("understood the following configuration: %+v\n", appConfiguration)
 	fmt.Println("-------------")
-	fmt.Println("NOTE: as this is an alpha - we rely on feedback - please report bugs and featurerequests to https://github.com/mwiora/NAMEinator/issues and provide this output")
+	fmt.Println("NOTE: as this is an alpha - we rely on feedback - please report bugs and feature requests to https://github.com/mwiora/NAMEinator/issues and provide this output")
 	fmt.Println("OS: " + runtime.GOOS + " ARCH: " + runtime.GOARCH)
 	fmt.Println("-------------")
 }
 
-func processResults(nsStore nsInfoMap) []NSinfo {
+func processResults(nsStore *nsInfoMap) []NInfo {
 	nsStore.mutex.Lock()
 	defer nsStore.mutex.Unlock()
-	var nsStoreSorted []NSinfo
+	var nsStoreSorted []NInfo
 	for _, entry := range nsStore.ns {
 		nsResults := nsStoreGetMeasurement(nsStore, entry.IPAddr)
 		entry.rttAvg = nsResults.rttAvg
@@ -87,7 +93,7 @@ func processResults(nsStore nsInfoMap) []NSinfo {
 		entry.rttMax = nsResults.rttMax
 		entry.ID = int64(nsResults.rttAvg)
 		nsStore.ns[entry.IPAddr] = entry
-		nsStoreSorted = append(nsStoreSorted, NSinfo{entry.IPAddr, entry.Name, entry.Country, entry.Count, entry.ErrorsConnection, entry.ErrorsValidation, entry.ID, entry.rtt, entry.rttAvg, entry.rttMin, entry.rttMax})
+		nsStoreSorted = append(nsStoreSorted, NInfo{entry.IPAddr, entry.Name, entry.Country, entry.Count, entry.ErrorsConnection, entry.ErrorsValidation, entry.ID, entry.rtt, entry.rttAvg, entry.rttMin, entry.rttMax})
 	}
 	sort.Slice(nsStoreSorted, func(i, j int) bool {
 		return nsStoreSorted[i].ID < nsStoreSorted[j].ID
@@ -96,7 +102,7 @@ func processResults(nsStore nsInfoMap) []NSinfo {
 }
 
 // prints results
-func printResults(nsStore nsInfoMap, nsStoreSorted []NSinfo) {
+func printResults(nsStore *nsInfoMap, nsStoreSorted []NInfo) {
 	fmt.Println("")
 	fmt.Println("finished - presenting results: ") // TODO: Colorful representation in a table PLEASE
 
@@ -117,17 +123,19 @@ func printBye() {
 	fmt.Println("Au revoir!")
 }
 
-func prepareBenchmark(nsStore nsInfoMap, dStore dInfoMap) {
+func prepareBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {
 	if appConfiguration.contest {
 		// we need to know who we are testing
-		var localdns = getOSdns()
-		loadNameserver(nsStore, localdns, "localhost")
+		var localDNS = getOSdns()
+		loadNameserver(nsStore, localDNS, "localhost")
 	}
 	prepareBenchmarkNameservers(nsStore)
 	prepareBenchmarkDomains(dStore)
 }
 
-func performBenchmark(nsStore nsInfoMap, dStore dInfoMap) {
+func performBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {
+	// create progress bar
+	bar := pb.Full.Start(len(nsStore.ns) * len(dStore.d))
 	// initialize DNS client
 	c := new(dns.Client)
 	// to avoid overload against one server we will test all defined nameservers with one domain before proceeding
@@ -137,17 +145,20 @@ func performBenchmark(nsStore nsInfoMap, dStore dInfoMap) {
 		m1.Id = dns.Id()
 		m1.RecursionDesired = true
 		m1.Question = make([]dns.Question, 1)
-		m1.Question[0] = dns.Question{domain.FQDN, dns.TypeA, dns.ClassINET}
+		m1.Question[0] = dns.Question{Name: domain.FQDN, Qtype: dns.TypeA, Qclass: dns.ClassINET}
 
 		// iterate through all given nameservers
 		for _, nameserver := range nsStore.ns {
 			in, rtt, err := c.Exchange(m1, "["+nameserver.IPAddr+"]"+":53")
 			_ = in
 			nsStoreSetRTT(nsStore, nameserver.IPAddr, rtt)
+			// increment progress bar
+			bar.Increment()
 			_ = err // TODO: Take care about errors during queries against the DNS - we will accept X fails
 		}
-		fmt.Print(".")
+		//fmt.Print(".")
 	}
+	bar.Finish()
 }
 
 func main() {
@@ -156,14 +167,16 @@ func main() {
 	printWelcome()
 
 	// prepare storage for nameservers and domains
-	var nsStore = nsInfoMap{ns: make(map[string]NSinfo)}
-	var dStore = dInfoMap{d: make(map[string]Dinfo)}
-	// var nsStoreSorted []NSinfo
+	var nsStore = &nsInfoMap{ns: make(map[string]NInfo)}
+	var dStore = &dInfoMap{d: make(map[string]DInfo)}
+	// var nsStoreSorted []NInfo
 
-	// based on startupconfiguration we have to do some preparation
+	// based on startup configuration we have to do some preparation
 	prepareBenchmark(nsStore, dStore)
-	// lets go benchmark - iterate through all domains
-	fmt.Println("LETS GO - each dot is a completed domain request against all nameservers")
+
+	// let's go benchmark - iterate through all domains
+	fmt.Println("LETS GO")
+
 	performBenchmark(nsStore, dStore)
 
 	// benchmark has been completed - now we have to tell the results and say good bye
