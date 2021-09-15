@@ -1,5 +1,10 @@
+before:
+  hooks:
+  - go mod tidy
 builds:
-- binary: NAMEinator
+- env:
+  - CGO_ENABLED=0
+  binary: NAMEinator
   goos:
   - windows
   - darwin
@@ -7,11 +12,15 @@ builds:
   goarch:
   - amd64
   - arm
+  - arm64
   goarm:
   - 6
   - 7
   ldflags: >
     -X main.VERSION={{.Version}}
-    -X main.DateBuilt={{.Date}}
+    -X main.DateBuilt={{.Date}
+  ignore:
+  - goos: windows
+    goarch: arm64
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
