@@ -27,8 +27,8 @@ or
 
 * compile yourself (requirement: install go (minimum 1.10.x) as described here https://golang.org/doc/install)
 ```
-go get github.com/mwiora/NAMEinator
-cd $GOPATH/src/github.com/mwiora/NAMEinator/
+go get github.com/mrwiora/NAMEinator
+cd $GOPATH/src/github.com/mrwiora/NAMEinator/
 go build
 ./NAMEinator
 ```
@@ -57,7 +57,7 @@ $ ./NAMEinator.exe
 starting NAMEinator - version 0.2 alpha
 understood the following configuration: {numberOfDomains:100 debug:false contest:true nameserver:}
 -------------
-NOTE: as this is an alpha - we rely on feedback - please report bugs and featurerequests to https://github.com/mwiora/NAMEinator/issues and provide this output
+NOTE: as this is an alpha - we rely on feedback - please report bugs and featurerequests to https://github.com/mrwiora/NAMEinator/issues and provide this output
 OS: windows ARCH: amd64
 -------------
 trying to load nameservers from datasrc/nameserver-globals.csv
