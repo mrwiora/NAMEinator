@@ -24,3 +24,5 @@ builds:
     goarch: arm64
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"
+files:
+  - datasrc/*
