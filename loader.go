@@ -23,8 +23,8 @@ func prepareBenchmarkNameservers(nsStore *nsInfoMap) {
 func prepareBenchmarkDomains(dStore *dInfoMap) {
 	var domains []string
 	// read domains from given file
-	fmt.Println("trying to load domains from alexa-top-2000-domains")
-	allDomains, err := readLoadDomainsFromFile("datasrc/alexa-top-2000-domains.txt")
+	fmt.Println("trying to load domains from cisco-umbrella-top-1m")
+	allDomains, err := readLoadDomainsFromFile("datasrc/cisco-umbrella-top-1m.txt")
 	if err != nil {
 		fmt.Println("File not found")
 		return
