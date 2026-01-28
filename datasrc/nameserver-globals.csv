@@ -1,8 +1,14 @@
 8.8.8.8,google-public-dns-a.google.com.,US
 8.8.4.4,google-public-dns-b.google.com.,US
 208.67.222.222,resolver1.opendns.com.,US
-2001:470:20::2,ordns.he.net.,US
-156.154.71.1,rdns2.ultradns.net.,US
+208.67.220.220,resolver2.opendns.com.,US
 216.146.35.35,resolver1.dyndnsinternetguide.com.,US
+216.146.36.36,resolver2.dyndnsinternetguide.com.,US
 1.1.1.1,one.one.one.one.,US
 1.0.0.1,one.one.one.one.,US
+9.9.9.9,dns.quad9.net.,US
+149.112.112.112,dns.quad9.net.,US
+209.244.0.3,resolver1.level3.net.,US
+209.244.0.4,resolver2.level3.net.,US
+149.112.121.10,private.canadianshield.cira.ca,CA
+149.112.122.10,private.canadianshield.cira.ca,CA
