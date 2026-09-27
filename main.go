@@ -11,6 +11,7 @@ import (
 	"regexp"
 	"runtime"
 	"sort"
+	"strings"
 )
 
 var VERSION = "custom"
@@ -20,7 +21,7 @@ type AppConfig struct {
 	numberOfDomains int
 	debug           bool
 	contest         bool
-	nameserver      string
+	nameserver      []string
 	nameserversFile string
 	domainsFile     string
 }
@@ -34,7 +35,7 @@ var datasrc embed.FS
 func processFlags() {
 	var appConfig AppConfig
 	flagNumberOfDomains := flag.Int("domains", 100, "number of domains to be tested")
-	flagNameserver := flag.String("nameserver", "", "specify a nameserver instead of using defaults")
+	flagNameserver := flag.String("nameserver", "", "specify one or more nameservers (comma separated, e.g. 1.1.1.1,9.9.9.9) instead of using defaults")
 	flagNameserversFile := flag.String("nameservers-file", "", "path to a CSV file (ip,name,country) with nameservers to test (default: built-in list)")
 	flagDomainsFile := flag.String("domains-file", "", "path to a text file with one domain per line (default: built-in list)")
 	flagContest := flag.Bool("contest", true, "contest=true/false : enable or disable a contest against your locally configured DNS server (default true)")
@@ -43,10 +44,18 @@ func processFlags() {
 	appConfig.numberOfDomains = *flagNumberOfDomains
 	appConfig.debug = *flagDebug
 	appConfig.contest = *flagContest
-	appConfig.nameserver = *flagNameserver
+	appConfig.nameserver = parseNameservers(*flagNameserver, flag.Args())
 	appConfig.nameserversFile = *flagNameserversFile
 	appConfig.domainsFile = *flagDomainsFile
 	appConfiguration = appConfig
+}
+
+// parseNameservers splits the -nameserver value on commas/whitespace; remaining
+// positional arguments are accepted as well, e.g. "-nameserver 1.1.1.1 9.9.9.9"
+func parseNameservers(value string, args []string) []string {
+	return strings.FieldsFunc(strings.Join(append([]string{value}, args...), " "), func(r rune) bool {
+		return r == ',' || r == ' ' || r == '\t'
+	})
 }
 
 // return the IP of the DNS used by the operating system
@@ -98,11 +107,18 @@ func processResults(nsStore *nsInfoMap) []NInfo {
 		entry.rttAvg = nsResults.rttAvg
 		entry.rttMin = nsResults.rttMin
 		entry.rttMax = nsResults.rttMax
+		entry.rttMedian = nsResults.rttMedian
+		entry.rttP95 = nsResults.rttP95
 		entry.ID = int64(nsResults.rttAvg)
 		nsStore.ns[entry.IPAddr] = entry
-		nsStoreSorted = append(nsStoreSorted, NInfo{entry.IPAddr, entry.Name, entry.Country, entry.Count, entry.ErrorsConnection, entry.ErrorsValidation, entry.ID, entry.rtt, entry.rttAvg, entry.rttMin, entry.rttMax})
+		nsStoreSorted = append(nsStoreSorted, entry)
 	}
+	// nameservers without a single successful answer go last
 	sort.Slice(nsStoreSorted, func(i, j int) bool {
+		iOK, jOK := len(nsStoreSorted[i].rtt) > 0, len(nsStoreSorted[j].rtt) > 0
+		if iOK != jOK {
+			return iOK
+		}
 		return nsStoreSorted[i].ID < nsStoreSorted[j].ID
 	})
 	return nsStoreSorted
@@ -116,7 +132,14 @@ func printResults(nsStore *nsInfoMap, nsStoreSorted []NInfo) {
 	for _, nameserver := range nsStoreSorted {
 		fmt.Println("")
 		fmt.Println(nameserver.IPAddr + ": ")
-		fmt.Printf("Avg. [%v], Min. [%v], Max. [%v] ", nameserver.rttAvg, nameserver.rttMin, nameserver.rttMax)
+		if len(nameserver.rtt) == 0 {
+			fmt.Print("WARNING: no successful answers - this nameserver is unreachable or failing ")
+		} else {
+			fmt.Printf("Avg. [%v], Median [%v], 95th perc. [%v], Min. [%v], Max. [%v] ", nameserver.rttAvg, nameserver.rttMedian, nameserver.rttP95, nameserver.rttMin, nameserver.rttMax)
+		}
+		if errors := nameserver.ErrorsConnection + nameserver.ErrorsValidation; errors > 0 {
+			fmt.Printf("\nErrors: %d of %d queries failed (%d unreachable/timeout, %d error responses e.g. SERVFAIL) ", errors, nameserver.Count, nameserver.ErrorsConnection, nameserver.ErrorsValidation)
+		}
 		if appConfiguration.debug {
 			fmt.Println(nsStoreGetRecord(nsStore, nameserver.IPAddr))
 		}
@@ -161,11 +184,23 @@ func performBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {
 		// iterate through all given nameservers
 		for _, nameserver := range nsStore.ns {
 			in, rtt, err := c.Exchange(m1, "["+nameserver.IPAddr+"]"+":53")
-			_ = in
-			nsStoreSetRTT(nsStore, nameserver.IPAddr, rtt)
+			switch {
+			case err != nil:
+				nsStoreAddConnectionError(nsStore, nameserver.IPAddr)
+				if appConfiguration.debug {
+					log.Printf("DEBUG: %s query for %s failed: %v", nameserver.IPAddr, domain.FQDN, err)
+				}
+			case in.Rcode != dns.RcodeSuccess && in.Rcode != dns.RcodeNameError:
+				// NXDOMAIN is a valid answer, SERVFAIL/REFUSED/... are not
+				nsStoreAddValidationError(nsStore, nameserver.IPAddr)
+				if appConfiguration.debug {
+					log.Printf("DEBUG: %s answered %s for %s", nameserver.IPAddr, dns.RcodeToString[in.Rcode], domain.FQDN)
+				}
+			default:
+				nsStoreSetRTT(nsStore, nameserver.IPAddr, rtt)
+			}
 			// increment progress bar
 			bar.Increment()
-			_ = err // TODO: Take care about errors during queries against the DNS - we will accept X fails
 		}
 		//fmt.Print(".")
 	}

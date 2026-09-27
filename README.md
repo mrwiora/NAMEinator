@@ -56,7 +56,7 @@ Usage of C:\Users\Administrator\go\src\NAMEinator\NAMEinator.exe:
   -domains-file string
         path to a text file with one domain per line (default: built-in list)
   -nameserver string
-        specify a nameserver instead of using defaults
+        specify one or more nameservers (comma separated, e.g. 1.1.1.1,9.9.9.9) instead of using defaults
   -nameservers-file string
         path to a CSV file (ip,name,country) with nameservers to test (default: built-in list)
 ```
@@ -64,6 +64,11 @@ Usage of C:\Users\Administrator\go\src\NAMEinator\NAMEinator.exe:
 The default nameserver and domain lists are embedded into the binary, so NAMEinator
 can be run from any directory - no `datasrc` folder is required next to it.
 Use `-nameservers-file` / `-domains-file` to benchmark your own lists.
+
+For every nameserver the average, median, 95th percentile, minimum and maximum response
+time of successful queries is reported. Queries that time out or are answered with an
+error (e.g. SERVFAIL, REFUSED) are not included in the timings but are counted and shown
+as errors.
 
 sample output of current version (debug off)
 ---------------

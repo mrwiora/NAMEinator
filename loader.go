@@ -29,8 +29,10 @@ func openDataFile(path string, embeddedPath string) (io.ReadCloser, error) {
 }
 
 func prepareBenchmarkNameservers(nsStore *nsInfoMap) error {
-	if appConfiguration.nameserver != "" {
-		loadNameserver(nsStore, appConfiguration.nameserver, "givenByParameter")
+	if len(appConfiguration.nameserver) > 0 {
+		for _, nameserver := range appConfiguration.nameserver {
+			loadNameserver(nsStore, nameserver, "givenByParameter")
+		}
 		return nil
 	}
 	// read global nameservers from given file
