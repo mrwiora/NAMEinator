@@ -45,9 +45,17 @@ Usage of C:\Users\Administrator\go\src\NAMEinator\NAMEinator.exe:
         enable or disable debugging (default false)
   -domains int
         number of domains to be tested (default 100)
+  -domains-file string
+        path to a text file with one domain per line (default: built-in list)
   -nameserver string
         specify a nameserver instead of using defaults
+  -nameservers-file string
+        path to a CSV file (ip,name,country) with nameservers to test (default: built-in list)
 ```
+
+The default nameserver and domain lists are embedded into the binary, so NAMEinator
+can be run from any directory - no `datasrc` folder is required next to it.
+Use `-nameservers-file` / `-domains-file` to benchmark your own lists.
 
 sample output of current version (debug off)
 ---------------
