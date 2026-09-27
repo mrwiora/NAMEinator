@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
   - go mod tidy
@@ -16,11 +18,21 @@ builds:
   goarm:
   - 6
   - 7
-  ldflags: >
-    -X main.VERSION={{.Version}}
-    -X main.DateBuilt={{.Date}
+  ldflags:
+  - -s -w -X main.VERSION={{.Version}}
   ignore:
   - goos: windows
-    goarch: arm64
+    goarch: arm
+archives:
+- formats: [tar.gz]
+  # Windows users expect a zip that Explorer can open natively
+  format_overrides:
+  - goos: windows
+    formats: [zip]
+  files:
+  - README.md
+  - COPYING
+  - AUTHORS
+  - datasrc/*
 checksum:
   name_template: "{{ .ProjectName }}_{{ .Version }}_checksums.txt"

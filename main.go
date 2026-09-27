@@ -77,7 +77,7 @@ func printWelcome() {
 	fmt.Println("starting NAMEinator - version " + VERSION)
 	fmt.Printf("understood the following configuration: %+v\n", appConfiguration)
 	fmt.Println("-------------")
-	fmt.Println("NOTE: as this is an alpha - we rely on feedback - please report bugs and feature requests to https://github.com/mwiora/NAMEinator/issues and provide this output")
+	fmt.Println("NOTE: as this is an alpha - we rely on feedback - please report bugs and feature requests to https://github.com/mrwiora/NAMEinator/issues and provide this output")
 	fmt.Println("OS: " + runtime.GOOS + " ARCH: " + runtime.GOARCH)
 	fmt.Println("-------------")
 }
