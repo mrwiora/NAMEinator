@@ -15,5 +15,9 @@ debug
 
 # for those working with GoLang...
 .idea
+
+# compiled binary
+/NAMEinator
+
 # goreleaser output
 dist/

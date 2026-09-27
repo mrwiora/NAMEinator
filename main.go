@@ -21,10 +21,13 @@ type AppConfig struct {
 	debug           bool
 	contest         bool
 	nameserver      string
+	nameserversFile string
+	domainsFile     string
 }
 
+// the default data files are embedded so the binary works from any directory
+//
 //go:embed datasrc
-
 var datasrc embed.FS
 
 // process flags
@@ -32,6 +35,8 @@ func processFlags() {
 	var appConfig AppConfig
 	flagNumberOfDomains := flag.Int("domains", 100, "number of domains to be tested")
 	flagNameserver := flag.String("nameserver", "", "specify a nameserver instead of using defaults")
+	flagNameserversFile := flag.String("nameservers-file", "", "path to a CSV file (ip,name,country) with nameservers to test (default: built-in list)")
+	flagDomainsFile := flag.String("domains-file", "", "path to a text file with one domain per line (default: built-in list)")
 	flagContest := flag.Bool("contest", true, "contest=true/false : enable or disable a contest against your locally configured DNS server (default true)")
 	flagDebug := flag.Bool("debug", false, "debug=true/false : enable or disable debugging (default false)")
 	flag.Parse()
@@ -39,6 +44,8 @@ func processFlags() {
 	appConfig.debug = *flagDebug
 	appConfig.contest = *flagContest
 	appConfig.nameserver = *flagNameserver
+	appConfig.nameserversFile = *flagNameserversFile
+	appConfig.domainsFile = *flagDomainsFile
 	appConfiguration = appConfig
 }
 
@@ -129,8 +136,12 @@ func prepareBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {
 		var localDNS = getOSdns()
 		loadNameserver(nsStore, localDNS, "localhost")
 	}
-	prepareBenchmarkNameservers(nsStore)
-	prepareBenchmarkDomains(dStore)
+	if err := prepareBenchmarkNameservers(nsStore); err != nil {
+		log.Fatal(err)
+	}
+	if err := prepareBenchmarkDomains(dStore); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func performBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {
