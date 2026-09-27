@@ -11,12 +11,14 @@ import (
 )
 
 func prepareBenchmarkNameservers(nsStore *nsInfoMap) {
-	if appConfiguration.nameserver == "" {
+	if len(appConfiguration.nameserver) == 0 {
 		// read global nameservers from given file
 		fmt.Println("trying to load nameservers from nameserver-globals")
 		readNameserversFromFile(nsStore, "datasrc/nameserver-globals.csv") // TODO: Split read and Load
 	} else {
-		loadNameserver(nsStore, appConfiguration.nameserver, "givenByParameter")
+		for _, nameserver := range appConfiguration.nameserver {
+			loadNameserver(nsStore, nameserver, "givenByParameter")
+		}
 	}
 }
 

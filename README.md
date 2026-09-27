@@ -46,8 +46,13 @@ Usage of C:\Users\Administrator\go\src\NAMEinator\NAMEinator.exe:
   -domains int
         number of domains to be tested (default 100)
   -nameserver string
-        specify a nameserver instead of using defaults
+        specify one or more nameservers (comma separated, e.g. 1.1.1.1,9.9.9.9) instead of using defaults
 ```
+
+For every nameserver the average, median, 95th percentile, minimum and maximum response
+time of successful queries is reported. Queries that time out or are answered with an
+error (e.g. SERVFAIL, REFUSED) are not included in the timings but are counted and shown
+as errors.
 
 sample output of current version (debug off)
 ---------------
