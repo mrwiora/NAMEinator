@@ -22,10 +22,13 @@ type AppConfig struct {
 	debug           bool
 	contest         bool
 	nameserver      []string
+	nameserversFile string
+	domainsFile     string
 }
 
+// the default data files are embedded so the binary works from any directory
+//
 //go:embed datasrc
-
 var datasrc embed.FS
 
 // process flags
@@ -33,6 +36,8 @@ func processFlags() {
 	var appConfig AppConfig
 	flagNumberOfDomains := flag.Int("domains", 100, "number of domains to be tested")
 	flagNameserver := flag.String("nameserver", "", "specify one or more nameservers (comma separated, e.g. 1.1.1.1,9.9.9.9) instead of using defaults")
+	flagNameserversFile := flag.String("nameservers-file", "", "path to a CSV file (ip,name,country) with nameservers to test (default: built-in list)")
+	flagDomainsFile := flag.String("domains-file", "", "path to a text file with one domain per line (default: built-in list)")
 	flagContest := flag.Bool("contest", true, "contest=true/false : enable or disable a contest against your locally configured DNS server (default true)")
 	flagDebug := flag.Bool("debug", false, "debug=true/false : enable or disable debugging (default false)")
 	flag.Parse()
@@ -40,6 +45,8 @@ func processFlags() {
 	appConfig.debug = *flagDebug
 	appConfig.contest = *flagContest
 	appConfig.nameserver = parseNameservers(*flagNameserver, flag.Args())
+	appConfig.nameserversFile = *flagNameserversFile
+	appConfig.domainsFile = *flagDomainsFile
 	appConfiguration = appConfig
 }
 
@@ -86,7 +93,7 @@ func printWelcome() {
 	fmt.Println("starting NAMEinator - version " + VERSION)
 	fmt.Printf("understood the following configuration: %+v\n", appConfiguration)
 	fmt.Println("-------------")
-	fmt.Println("NOTE: as this is an alpha - we rely on feedback - please report bugs and feature requests to https://github.com/mwiora/NAMEinator/issues and provide this output")
+	fmt.Println("NOTE: as this is an alpha - we rely on feedback - please report bugs and feature requests to https://github.com/mrwiora/NAMEinator/issues and provide this output")
 	fmt.Println("OS: " + runtime.GOOS + " ARCH: " + runtime.GOARCH)
 	fmt.Println("-------------")
 }
@@ -152,8 +159,12 @@ func prepareBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {
 		var localDNS = getOSdns()
 		loadNameserver(nsStore, localDNS, "localhost")
 	}
-	prepareBenchmarkNameservers(nsStore)
-	prepareBenchmarkDomains(dStore)
+	if err := prepareBenchmarkNameservers(nsStore); err != nil {
+		log.Fatal(err)
+	}
+	if err := prepareBenchmarkDomains(dStore); err != nil {
+		log.Fatal(err)
+	}
 }
 
 func performBenchmark(nsStore *nsInfoMap, dStore *dInfoMap) {

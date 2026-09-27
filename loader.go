@@ -7,37 +7,68 @@ import (
 	"io"
 	"math/rand"
 	"os"
+	"strings"
 	"time"
+
+	"github.com/miekg/dns"
 )
 
-func prepareBenchmarkNameservers(nsStore *nsInfoMap) {
-	if len(appConfiguration.nameserver) == 0 {
-		// read global nameservers from given file
-		fmt.Println("trying to load nameservers from nameserver-globals")
-		readNameserversFromFile(nsStore, "datasrc/nameserver-globals.csv") // TODO: Split read and Load
-	} else {
+const (
+	defaultNameserversFile = "datasrc/nameserver-globals.csv"
+	defaultDomainsFile     = "datasrc/alexa-top-2000-domains.txt"
+)
+
+// openDataFile opens a user supplied file from disk or, if no path is given, the embedded default
+func openDataFile(path string, embeddedPath string) (io.ReadCloser, error) {
+	if path != "" {
+		fmt.Println("trying to load " + path)
+		return os.Open(path)
+	}
+	fmt.Println("trying to load built-in " + embeddedPath)
+	return datasrc.Open(embeddedPath)
+}
+
+func prepareBenchmarkNameservers(nsStore *nsInfoMap) error {
+	if len(appConfiguration.nameserver) > 0 {
 		for _, nameserver := range appConfiguration.nameserver {
 			loadNameserver(nsStore, nameserver, "givenByParameter")
 		}
+		return nil
 	}
+	// read global nameservers from given file
+	file, err := openDataFile(appConfiguration.nameserversFile, defaultNameserversFile)
+	if err != nil {
+		return fmt.Errorf("unable to open nameserver list: %w", err)
+	}
+	defer file.Close()
+	return readNameservers(nsStore, file)
 }
 
-func prepareBenchmarkDomains(dStore *dInfoMap) {
-	var domains []string
+func prepareBenchmarkDomains(dStore *dInfoMap) error {
 	// read domains from given file
-	fmt.Println("trying to load domains from alexa-top-2000-domains")
-	allDomains, err := readLoadDomainsFromFile("datasrc/alexa-top-2000-domains.txt")
+	file, err := openDataFile(appConfiguration.domainsFile, defaultDomainsFile)
 	if err != nil {
-		fmt.Println("File not found")
-		return
+		return fmt.Errorf("unable to open domain list: %w", err)
 	}
-	_ = err // TODO: Exception handling in case that the files do not exist
+	defer file.Close()
+	allDomains, err := readDomains(file)
+	if err != nil {
+		return fmt.Errorf("unable to read domain list: %w", err)
+	}
+	if len(allDomains) == 0 {
+		return fmt.Errorf("domain list is empty")
+	}
 	// randomize domains from file to avoid cached results
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(allDomains), func(i, j int) { allDomains[i], allDomains[j] = allDomains[j], allDomains[i] })
 	// take care only for the domain-tests we were looking for
-	domains = allDomains[0:appConfiguration.numberOfDomains]
-	dStoreAddFQDN(dStore, domains)
+	numberOfDomains := appConfiguration.numberOfDomains
+	if numberOfDomains <= 0 || numberOfDomains > len(allDomains) {
+		fmt.Printf("requested %d domains, but %d are available - using %d\n", numberOfDomains, len(allDomains), len(allDomains))
+		numberOfDomains = len(allDomains)
+	}
+	dStoreAddFQDN(dStore, allDomains[:numberOfDomains])
+	return nil
 }
 
 // load nameservers
@@ -45,39 +76,47 @@ func loadNameserver(nsStore *nsInfoMap, ip string, name string) {
 	nsStoreAddNS(nsStore, ip, name, "LOCAL")
 }
 
-// load nameservers
-func readNameserversFromFile(nsStore *nsInfoMap, filename string) {
-	csvFile, _ := os.Open(filename)
-	nameserverReader := csv.NewReader(bufio.NewReader(csvFile))
+// readNameservers reads "ip,name,country" records; name and country are optional
+func readNameservers(nsStore *nsInfoMap, r io.Reader) error {
+	nameserverReader := csv.NewReader(bufio.NewReader(r))
+	nameserverReader.FieldsPerRecord = -1
+	nameserverReader.TrimLeadingSpace = true
+	nameserverReader.Comment = '#'
+	loaded := 0
 	for {
 		line, err := nameserverReader.Read()
 		if err == io.EOF {
 			break
 		}
-		// fmt.Println(line)
-		nsStoreAddNS(nsStore, line[0], line[1], line[2])
-		_ = err
+		if err != nil {
+			return fmt.Errorf("unable to read nameserver list: %w", err)
+		}
+		fields := make([]string, 3)
+		copy(fields, line)
+		ip := strings.TrimSpace(fields[0])
+		if ip == "" {
+			continue
+		}
+		nsStoreAddNS(nsStore, ip, strings.TrimSpace(fields[1]), strings.TrimSpace(fields[2]))
+		loaded++
 	}
+	if loaded == 0 {
+		return fmt.Errorf("nameserver list is empty")
+	}
+	return nil
 }
 
-// readDomainsFromFile reads a whole file into memory
-// and returns a slice of its lines.
-func readLoadDomainsFromFile(path string) ([]string, error) {
-	file, err := os.Open(path)
-	if err != nil {
-		return nil, err
-	}
-	defer func(file *os.File) {
-		err := file.Close()
-		if err != nil {
-			panic(err)
-		}
-	}(file)
-
+// readDomains returns the non-empty lines of the given reader
+func readDomains(r io.Reader) ([]string, error) {
 	var lines []string
-	scanner := bufio.NewScanner(file)
+	scanner := bufio.NewScanner(r)
 	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		// the resolver expects fully qualified names, e.g. "example.com."
+		lines = append(lines, dns.Fqdn(line))
 	}
 	return lines, scanner.Err()
 }

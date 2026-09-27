@@ -1,4 +1,4 @@
-NAMEinator [![Build Status](https://travis-ci.org/mwiora/NAMEinator.svg)](https://travis-ci.org/mwiora/NAMEinator) [![Code Climate](https://codeclimate.com/github/mwiora/NAMEinator/badges/gpa.svg)](https://codeclimate.com/github/mwiora/NAMEinator)
+NAMEinator [![CodeQL](https://github.com/mrwiora/NAMEinator/actions/workflows/codeql.yml/badge.svg)](https://github.com/mrwiora/NAMEinator/actions/workflows/codeql.yml) [![Code Climate](https://codeclimate.com/github/mwiora/NAMEinator/badges/gpa.svg)](https://codeclimate.com/github/mwiora/NAMEinator)
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet experience?
@@ -25,10 +25,18 @@ windows users are fine :)
 
 or
 
-* compile yourself (requirement: install go (minimum 1.10.x) as described here https://golang.org/doc/install)
+* install with go (requirement: a recent go toolchain as described here https://go.dev/doc/install)
 ```
-go get github.com/mrwiora/NAMEinator
-cd $GOPATH/src/github.com/mrwiora/NAMEinator/
+go install github.com/mrwiora/NAMEinator@latest
+NAMEinator
+```
+
+or
+
+* compile yourself
+```
+git clone https://github.com/mrwiora/NAMEinator.git
+cd NAMEinator
 go build
 ./NAMEinator
 ```
@@ -45,9 +53,17 @@ Usage of C:\Users\Administrator\go\src\NAMEinator\NAMEinator.exe:
         enable or disable debugging (default false)
   -domains int
         number of domains to be tested (default 100)
+  -domains-file string
+        path to a text file with one domain per line (default: built-in list)
   -nameserver string
         specify one or more nameservers (comma separated, e.g. 1.1.1.1,9.9.9.9) instead of using defaults
+  -nameservers-file string
+        path to a CSV file (ip,name,country) with nameservers to test (default: built-in list)
 ```
+
+The default nameserver and domain lists are embedded into the binary, so NAMEinator
+can be run from any directory - no `datasrc` folder is required next to it.
+Use `-nameservers-file` / `-domains-file` to benchmark your own lists.
 
 For every nameserver the average, median, 95th percentile, minimum and maximum response
 time of successful queries is reported. Queries that time out or are answered with an

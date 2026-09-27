@@ -1,8 +1,20 @@
-module NAMEinator
+module github.com/mrwiora/NAMEinator
 
-go 1.16
+go 1.26.0
 
 require (
-	github.com/cheggaaa/pb/v3 v3.0.8
-	github.com/miekg/dns v1.1.31
+	github.com/cheggaaa/pb/v3 v3.2.1
+	github.com/miekg/dns v1.1.73
+)
+
+require (
+	github.com/VividCortex/ewma v1.2.0 // indirect
+	github.com/clipperhouse/uax29/v2 v2.2.0 // indirect
+	github.com/fatih/color v1.19.0 // indirect
+	github.com/mattn/go-colorable v0.1.15 // indirect
+	github.com/mattn/go-isatty v0.0.24 // indirect
+	github.com/mattn/go-runewidth v0.0.27 // indirect
+	golang.org/x/net v0.59.0 // indirect
+	golang.org/x/sync v0.23.0 // indirect
+	golang.org/x/sys v0.48.0 // indirect
 )
