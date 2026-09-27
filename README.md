@@ -1,4 +1,4 @@
-NAMEinator [![Build Status](https://travis-ci.org/mwiora/NAMEinator.svg)](https://travis-ci.org/mwiora/NAMEinator) [![Code Climate](https://codeclimate.com/github/mwiora/NAMEinator/badges/gpa.svg)](https://codeclimate.com/github/mwiora/NAMEinator)
+NAMEinator [![CodeQL](https://github.com/mrwiora/NAMEinator/actions/workflows/codeql.yml/badge.svg)](https://github.com/mrwiora/NAMEinator/actions/workflows/codeql.yml) [![Code Climate](https://codeclimate.com/github/mwiora/NAMEinator/badges/gpa.svg)](https://codeclimate.com/github/mwiora/NAMEinator)
 =========
 
 Are you a power-user with 5 minutes to spare? Do you want a faster internet experience?
@@ -25,10 +25,18 @@ windows users are fine :)
 
 or
 
-* compile yourself (requirement: install go (minimum 1.10.x) as described here https://golang.org/doc/install)
+* install with go (requirement: a recent go toolchain as described here https://go.dev/doc/install)
 ```
-go get github.com/mrwiora/NAMEinator
-cd $GOPATH/src/github.com/mrwiora/NAMEinator/
+go install github.com/mrwiora/NAMEinator@latest
+NAMEinator
+```
+
+or
+
+* compile yourself
+```
+git clone https://github.com/mrwiora/NAMEinator.git
+cd NAMEinator
 go build
 ./NAMEinator
 ```
